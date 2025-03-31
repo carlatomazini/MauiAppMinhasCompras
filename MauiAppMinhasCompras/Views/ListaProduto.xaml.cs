@@ -21,7 +21,7 @@ public partial class ListaProduto : ContentPage
     {
         try
         {
-
+            Lista.Clear();
 
             List<Produto> tmp = await App.Db.GetAll();
 
@@ -32,6 +32,11 @@ public partial class ListaProduto : ContentPage
         {
             await DisplayAlert("Ops", ex.Message, "OK");
         }
+    }
+
+    private void lst_produtos_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+    {
+
     }
 }
 
@@ -76,9 +81,47 @@ private async void txt_search_TextChanged(object sender, TextChangedEventArgs e)
         DisplayAlert("Total dos Produtos", msg, "OK");
     }
 
-    private void MenuItem_Clicked(object sender, EventArgs e)
+    private async void MenuItem_Clicked(object sender, EventArgs e)
     {
+    try
+    {
+        MenuItem selecionado = sender as MenuItem;
+
+        Produto p = selecionado.BindingContext as Produto;
+
+        bool confirm = await DisplayAlert("Tem Certeza?", $"Remover {p.Descricao}?", "Sim", "Não");
+
+        if (confirm)
+        {
+            await App.Db.Delete(p.Id);
+            Lista.Remove(p);
+        }
+
+
 
     }
+    catch (Exception ex)
+    {
+       DisplayAlert("Ops", ex.Message, "OK");
+    }
 }
+
+privated void lst_produtos_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+{
+    try
+    {
+        Produto p = e.SelectedItem as Produto;
+
+        Navigation.PushAsync(new Views.EditarProduto
+        {
+            BindingContext = p,
+        }
+            );
+    }
+    catch (Exception ex)
+    {
+       DisplayAlert("Ops", ex.Message, "OK");
+    }
 }
+
+
